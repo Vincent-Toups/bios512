@@ -1,0 +1,1013 @@
+
+Programming: What is It?
+========================
+
+I want to start today's lecture with a recommendation for a mind-
+blowing book: Scott Aaronson's "Quantum Computing Since Democritus."
+
+Aaronson has a very fun style in which the gist is always conveyed
+without sacrificing rigor. If you've ever wondered what the heck
+quantum computing is all about, and whether quantum computers really
+"do all the possible calculations at the same time," it's a great book
+to read and you hardly need all that much physics to understand it.
+
+But the reason I'm recommending it today is because it really gets
+across the basic idea of computer science which is: imagine the set of
+all tasks you can accomplish by following a finite set of
+instructions, some way of recording information, and a reasonable
+amount of time and space? 
+
+There is a whole fascinating history here. Mathematicians are happy to
+wrestle with various notions of infinity, but programs must terminate
+in a finite number of steps to produce values. It isn't too inaccurate
+to say that computing is just finite mathematics. 
+
+Today we will inaugurate ourselves into the wonderful world of
+computing!
+
+I'll end today's introduction by relating one of my favorite
+anecdotes from the history of mathematics.
+
+
+
+```
+    I have seen some ultrafinitists go so far as to challenge the
+    existence of 2^100 as a natural number, in the sense of there
+    being a series of “points” of that length. There is the obvious
+    “draw the line” objection, asking where in 21, 22, 23, … , 2^100
+    do we stop having “Platonistic reality”? Here this … is totally
+    innocent, in that it can be easily be replaced by 100 items
+    (names) separated by commas. I raised just this objection with the
+    (extreme) ultrafinitist Yessenin-Volpin during a lecture of
+    his. He asked me to be more specific. I then proceeded to start
+    with 21 and asked him whether this is “real” or something to that
+    effect. He virtually immediately said yes. Then I asked about 22,
+    and he again said yes, but with a perceptible delay. Then 23, and
+    yes, but with more delay. This continued for a couple of more
+    times, till it was obvious how he was handling this
+    objection. Sure, he was prepared to always answer yes, but he was
+    going to take 2100 times as long to answer yes to 2100 then he
+    would to answering 21. There is no way that I could get very far
+    with this.
+
+    Harvey M. Friedman “Philosophical Problems in Logic”
+
+```
+
+Working with a computer is like working with Yessenin-Volpin.
+
+Evaluation
+==========
+
+The Simplest Expressions
+------------------------
+
+
+We've already seen this with Bash. Today, our plan is to build an evaluation model for R. As with Bash, we aren't going to try to achieve a perfect mental model, but we will go substantially further than we did with Bash.
+
+We will need to think a bit more about types as well. Let's just get started.
+
+```{r}
+10
+```
+
+If you open this document in Rstudio, you will be able to click the little green arrow at the top of the above cell (and others like it) and see the result of evaluating the code (and any side effects).
+
+Who can give me a rule which explains this behavior?
+
+Here is one:
+
+```
+Rules:
+1. The characters representing a number evaluate to the number.
+```
+
+Here is another snippet.
+
+```{r}
+"Hello"
+```
+
+A set of characters between `"` characters evaluate to a string.
+
+```
+Rules:
+1. The characters representing a number evaluate to the number.
+2. A set of characters between `"` characters evaluate to a string.
+```
+
+What about:
+
+```{r}
+'abcdef'
+```
+
+```
+Rules:
+1. The characters representing a number evaluate to the number.
+2. A set of characters between `"` characters evaluate to a string.
+   (a) Or a set of characters between `'`
+```
+
+One more string-related expression:
+
+```{r}
+"this includes quotes:\"\""
+```
+
+A little tricky! When we put a backslash before a character, we tell the interpreter to treat it differently than it usually would. This is a convention widely used throughout programming, although sometimes you see "%" used as the escape character or some other convention. In the case of reading strings, we need to modify our rule a little bit.
+
+```
+ Rules:
+ 1. The characters representing a number evaluate to the number.
+ 2. A set of characters between unescaped `"` characters evaluate to a string.
+    (a) Or a set of characters between unescaped `'`
+```
+
+Bonus points: what if you want to put a backslash into a string? Any guesses?
+
+
+Algebraic Expressions
+---------------------
+
+```{r}
+10 + 11
+```
+Rules:
+1. The characters representing a number are evaluated as the number.
+2. A set of characters between unescaped `"` characters are evaluated as a string.
+   (a) or a set of characters between unescaped `'`.
+3. When number representations appear in an algebraic expression, the
+   result is evaluated based on the algebraic expression applied to
+   the numbers produced by evaluating the character representations of
+   the numbers. 
+
+That might seem like a long-winded way of saying what is happening,
+but it's useful to be precise. 
+
+```{r}
+(10 + 11) * 2
+```
+
+Ordinary "high school" precedence rules apply to algebraic
+statements. You might think this is obvious, but the most interesting
+languages tend not to follow these rules for some reason.
+
+Variables
+---------
+
+```{r}
+x <- 100
+x
+```
+
+If we evaluate the code above, nothing visible happens. `<-` is called
+"assignment" and, believe it or not, it is similar to the operators
+we've encountered above. But its primary use is not to produce a
+value. It creates (or modifies, as we shall see) a _binding_. A
+_binding_ is a relationship between a name and a value.
+
+```{r}
+y <- 10101
+y
+```
+
+Note that we can use `<-` to modify bindings as well. 
+
+```{r}
+y <- "Hello World"
+y
+```
+
+We can store strings and numbers in the same variable or,
+speaking more carefully, a binding doesn't care about the value to
+which it points.
+
+Here is our new set of rules.
+
+```
+Rules:
+1. The characters representing a number are evaluated as the number.
+2. A set of characters between unescaped `"` characters are evaluated as a string.
+   (a) or a set of characters between unescaped `'`.
+3. When number representations appear in an algebraic expression, the
+   result is evaluated based on the algebraic expression applied to
+   the numbers produced by evaluating the character representations of
+   the numbers. 
+4. Expressions like `<name> <- <expr>` evaluate `<expr>` and create a
+   binding to `<name>`.
+5. `<name>` is evaluated as whatever binding maps `<name>` to a
+   value. It's an error to mention a name that doesn't have a binding.
+```
+
+NB: A bit of experimentation will confirm that names can contain upper
+and lowercase letters and underscores but not other punctuation. There
+are probably other rules, but we aren't going to address them in detail here.
+
+
+
+R's Suite of Assignment Operators
+---------------------------------
+
+In many languages `=` is the assignment operator. And sure enough, one
+can say:
+
+```{r}
+x = 10
+x
+```
+
+In R and the expected thing happens. Indeed, you may also write:
+
+```{r}
+x <<- 10
+```
+
+And get what appears to be similar behavior. The difference between
+`<-` and `=` is somewhat subtle and hinges on a thing you should
+probably never do anyway. The convention is to use `<-` everywhere
+unless you mean `<<-`. But we can't yet understand what `<<-` means
+yet.
+
+Collections
+-----------
+
+Collection types are very important in R. Indeed, we shall see that
+almost all values are in fact collections of one kind or another. But
+that comes a bit later. For now, consider:
+
+```{r}
+1:10
+```
+
+Our rule is something like:
+
+```
+Rules:
+1. the characters representing a number evaluates to the number.
+2. A set of characters between unescaped `"` characters evaluates to a string.
+   (a) or a set of characters between unescaped `'`
+3. When number-representations appear in an algebraic expression the
+   result is the result of applying the algebraic expression to the
+   numbers produced by evaluating the character representations of the
+   numbers. 
+4. And expressions like `<name> <- <expr>` evaluates `<expr>` and creates a
+   binding to `<name>`.
+5. `<name>` evaluates to whatever binding maps `<name>` to a
+   value. Its an error to mention a name that doesn't have a binding.
+6. <expr1>:<expr> produces a sequence of numbers called an array
+   starting at <expr1> and ending at <expr2>.
+```
+
+In actuality the semantics of `:` are somewhat more complicated but
+for our purposes this is enough.
+
+We can also denote a collection literally like this:
+
+```{r}
+c(1,2,3)
+```
+
+A few things which would be tedious to figure out by
+experimentation. Collections must be "homogeneous" which means they
+must contain elements which share a type. One often calls such
+homogeneous collections "arrays."
+
+A new rule:
+
+```
+Rules:
+1. the characters representing a number evaluates to the number.
+2. A set of characters between unescaped `"` characters evaluates to a string.
+   (a) or a set of characters between unescaped `'`
+3. When number-representations appear in an algebraic expression the
+   result is the result of applying the algebraic expression to the
+   numbers produced by evaluating the character representations of the
+   numbers. 
+4. And expressions like `<name> <- <expr>` evaluates `<expr>` and creates a
+   binding to `<name>`.
+5. `<name>` evaluates to whatever binding maps `<name>` to a
+   value. Its an error to mention a name that doesn't have a binding.
+6. <expr1>:<expr> produces a sequence of numbers called an array
+   starting at <expr1> and ending at <expr2>.
+7. An expression like: c(<e1>,<e2>,...,<en>) produces an array of the
+   values produced by evaluating <e1> through <en>.
+```
+
+Fun questions which are not that important except when they are: What
+order are the `<en>` evaluated in?
+
+Function Calls
+--------------
+
+Consider:
+
+```{r}
+x <- 10*pi;
+y <- sin(x);
+print(y)
+```
+
+Observation:
+
+```
+1. there are variables that are pre-bound.
+2. some (most) of them are "functions".
+```
+
+New rule:
+
+```
+Rules:
+1. the characters representing a number evaluates to the number.
+2. A set of characters between unescaped `"` characters evaluates to a string.
+   (a) or a set of characters between unescaped `'`
+3. When number-representations appear in an algebraic expression the
+   result is the result of applying the algebraic expression to the
+   numbers produced by evaluating the character representations of the
+   numbers. 
+4. And expressions like `<name> <- <expr>` evaluates `<expr>` and creates a
+   binding to `<name>`.
+5. `<name>` evaluates to whatever binding maps `<name>` to a
+   value. Its an error to mention a name that doesn't have a binding.
+6. <expr1>:<expr> produces a sequence of numbers called an array
+   starting at <expr1> and ending at <expr2>.
+xb7. An expression like: c(<e1>,<e2>,...,<en>) produces an array of the
+   values produced by evaluating <e1> through <en>.
+8. an expression like <expr>(<a1>, <a2>, ...) is a 'function call'. It evaluates 
+   to the function value. For build in functions this is just given to us.
+```
+
+Question: is `c` a function? What about `+`, `-`, etc?
+
+Answer: They are functions. In most languages they would be operators,
+but in R just about everything is a function. `+`, `-` etc are _infix_
+functions and the language allows us to rely on precedence. But we can
+always invoke them in the "ordinary" way like this:
+
+```{r}
+`+`(1,2)
+
+z <- `+`
+z(1,2)
+ 
+```
+
+```
+Rules:
+1. the characters representing a number evaluates to the number.
+2. A set of characters between unescaped `"` characters evaluates to a string.
+   (a) or a set of characters between unescaped `'`
+3. When number-representations appear in an algebraic expression the
+   result is the result of applying the algebraic expression to the
+   numbers produced by evaluating the character representations of the
+   numbers. 
+4. And expressions like `<name> <- <expr>` evaluates `<expr>` and creates a
+   binding to `<name>`.
+5. `<name>` evaluates to whatever binding maps `<name>` to a
+   value. Its an error to mention a name that doesn't have a binding.
+6. <expr1>:<expr> produces a sequence of numbers called an array
+   starting at <expr1> and ending at <expr2>.
+7. An expression like: c(<e1>,<e2>,...,<en>) produces an array of the
+   values produced by evaluating <e1> through <en>.
+8. an expression like <expr>(<a1>, <a2>, ...) is a 'function call'. It evaluates 
+   to the function value. For build in functions this is just given to us.
+9. An expression like `<expr>`(<a1>, <a2>, ...) is a function call but <expr> must be an infix or special operator.
+```
+
+Note that even `<-` is a function! This use of functions for
+everything, along with some other properties of R, make R a very hard
+language to _optimize_ but there is a lot to be said for the
+uniformity.
+
+Conditionals and Loops 
+----------------------
+
+Conditionals and loops are what makes a language "Turing Complete"
+which basically means you can compute anything computable with it.
+
+In that sense they are important. I will say rather gnomically that
+conditionals and especially loops are code smells, though. If you see
+a lot of them you should probably think about what you are
+doing. Anyway, we must cover them for completeness's sake:
+
+First consider:
+
+```{r}
+c(T,F)
+```
+
+Apparently this produces an array of Boolean values. Two new rules:
+
+
+```
+Rules:
+1. the characters representing a number evaluates to the number.
+2. A set of characters between unescaped `"` characters evaluates to a string.
+   (a) or a set of characters between unescaped `'`
+3. When number-representations appear in an algebraic expression the
+   result is the result of applying the algebraic expression to the
+   numbers produced by evaluating the character representations of the
+   numbers. 
+4. And expressions like `<name> <- <expr>` evaluates `<expr>` and creates a
+   binding to `<name>`.
+5. `<name>` evaluates to whatever binding maps `<name>` to a
+   value. Its an error to mention a name that doesn't have a binding.
+6. <expr1>:<expr> produces a sequence of numbers called an array
+   starting at <expr1> and ending at <expr2>.
+7. An expression like: c(<e1>,<e2>,...,<en>) produces an array of the
+   values produced by evaluating <e1> through <en>.
+8. an expression like <expr>(<a1>, <a2>, ...) is a 'function call'. It evaluates 
+   to the function value. For build in functions this is just given to us.
+9. An expression like `<expr>`(<a1>, <a2>, ...) is a function call but <expr> must be an infix or special operator.
+```
+
+### Conditionals
+
+```{r}
+x <- 10;
+if(x < 100){
+    "Hello"
+} else {
+    "Goodbye"
+}
+```
+
+This _evaluates to_ "Hello". Eg, we may write:
+
+```{r}
+x <- 10;
+y <- if (x < 100){
+         "Hello"
+     } else {
+         "Goodbye"
+     }
+```
+
+STOP
+
+This will give 10. 
+
+```
+Rules:
+1. the characters representing a number evaluates to the number.
+2. A set of characters between unescaped `"` characters evaluates to a string.
+   (a) or a set of characters between unescaped `'`
+3. When number-representations appear in an algebraic expression the
+   result is the result of applying the algebraic expression to the
+   numbers produced by evaluating the character representations of the
+   numbers. 
+4. And expressions like `<name> <- <expr>` evaluates `<expr>` and creates a
+   binding to `<name>`.
+5. `<name>` evaluates to whatever binding maps `<name>` to a
+   value. Its an error to mention a name that doesn't have a binding.
+6. <expr1>:<expr> produces a sequence of numbers called an array
+   starting at <expr1> and ending at <expr2>.
+7. An expression like: c(<e1>,<e2>,...,<en>) produces an array of the
+   values produced by evaluating <e1> through <en>.
+8. an expression like <expr>(<a1>, <a2>, ...) is a 'function call'. It evaluates 
+   to the function value. For build in functions this is just given to us.
+9. An expression like `<expr>`(<a1>, <a2>, ...) is a function call but <expr> must be an infix or special operator.
+10. if(<expr1>){ <t1>; ... <tn> } else { <f1>; ... <fn> } evalutes to <tn> if <expr1> is T, and <fn> otherwise. F, 0 count as False and most other values count as true.
+```
+
+### Loops
+
+```{r}
+x <- 0;
+while (x < 10) {
+    x <- x + 1;
+}
+x
+```
+
+```
+11. while(<test>) { body0; .. bodyN } evaluates the block until <test> is F.
+```
+
+```{r}
+for(x in c(1,2,3)) {
+    print(x)
+}
+```
+
+```
+12. for(<name> in <sequence-expression>) {
+        <body0>;
+        ...
+        <bodyN>;
+    } Evaluates the block many times, with <name> bound to subsequent values of 
+    <sequence-expression>.
+```
+
+Functions
+---------
+
+Now we get to the good stuff.
+
+```
+quadratic_formula <- function(a,b,c){
+    r <- sqrt(b*b - 4*a*c);
+    n1 <- -b + r;
+    n2 <- -b - r;
+    d <- 2*a;
+    c(n1/d, n2/d);
+}
+quadratic_formula(9,100,11)
+```
+
+Observation: Creating a function is just creating a certain kind of
+value. Function values are bound to variables in the same way as other
+kinds of values.
+
+So we don't need to modify our evaluation rules for variable binding
+for functions.
+
+But we need to think a little bit about what is going on inside the
+"body" of the function.
+
+```{r}
+quadratic_formula <- function(a,b,c){
+    r <- sqrt(b*b - 4*a*c);
+    n1 <- -b + r;
+    n2 <- -b - r;
+    d <- 2*a;
+    c(n1/d, n2/d);
+}
+quadratic_formula(9,100,11)
+c(r, n1, n2, d)
+```
+
+What will this give? Answer: an error. We bound a series of variables
+_inside_ the function but these bindings do not persist outside of
+it. When the function is called it creates a new environment in which
+to evaluate its body.
+
+That environment comes pre-furnished with bindings which come from its
+argument list (a, b, and c in our example), but the programmer may
+extend the environment using `<-` expressions.
+
+
+Our rule for function definitions is sort of complicated:
+
+```
+13.  function(<a1>, ... <an>) {
+         <b1>;
+         ...
+         <bn>
+     } creates a new function. When the function is called R creates a new environment
+       and evaluates the terms <b1> through <bn> in it. The functions final 
+       value is <bn>.
+```
+
+Revisiting Variable Lookup
+--------------------------
+
+Now that we have the ability to create new environments we have to
+think relatively carefully about how variables are looked up. So far
+we've just had a single environment: the so-called "top level". We've
+added bindings to the top level using `<name> <- <expr>`
+statements. But now we have multiple environments with which to
+interact.
+
+Note that we can call a function immediately, without giving it a
+name. And we may use a single expression instead of a block.
+
+```{r}
+x <- 1000;
+(function() x)()
+```
+
+From this example we can conclude that _if_ R finds no binding in the
+enclosing environment, then it looks in the parent environment for a
+value. But let's put a finer point on this idea.
+
+```{r}
+make_constant_function <- function(value){
+    function(){
+        value;
+    }
+}
+always_1 <- make_constant_function(1);
+```
+
+We may construct many such functions:
+
+```{r}
+always_hi <- make_constant_function("hi");
+```
+
+```
+14. Inside function environments, variables are looked up using a rule called 
+"lexical scope." The nearest enclosing binding _in the text of the program_ is 
+returned. Thus functions "remember" their environment, even if it would otherwise
+be transient in nature.
+```
+
+Given a variable binding in an environment, we have been able to
+modify it using `<-`:
+
+```{r}
+x <- 10;
+x <- 11; ## This modifies the binding of x.
+x
+```
+
+Consider the following example. We want a function which returns a
+function which acts like a counter. We provide an initial value and
+an incr and then we get back a function which counts from the
+initial value by the incr on each call.
+
+```{r}
+
+make_counter_attempt <- function(start, incr){
+    value <- start;
+    function(){
+        old_value <- value;
+        value <- value + 1;
+        old_value;
+    }
+}
+counter_from_1 <- make_counter_attempt(1,1);
+counter_from_1()
+counter_from_1()
+```
+
+This returns 1 no many how many times we call it. Why?
+
+Because `<-` creates a binding in the _inner_ function
+environment. It doesn't _update_ the parent environment's
+_value_. We need another operator for that: `<<-`.
+
+Here is the correct version:
+
+```{r}
+make_counter <- function(start, incr){
+    value <- start;
+    function(){
+        old_value <- value;
+        value <<- value + incr; ## Update the old value in the parent scope.
+        old_value;
+    }
+}
+counter_from_1 <- make_counter(1,1);
+counter_from_1()
+counter_from_1()
+```
+
+This gives us what we want.
+
+```
+15. `<-` always creates a binding in the current environment. 
+`<<-` modifies the nearest enclosing binding if it exists. 
+Otherwise it creates a new one.
+```
+
+Named And Default Arguments
+---------------------------
+
+Arguments to functions are typically assigned by order but you can
+also give arguments default values (which also gives the user the
+ability to specify arguments by name).
+
+```{r}
+example <- function(x=10,y=11){
+    x+y;
+}
+```
+
+```{r}
+example(x=100);
+example(y=13);
+example(y=12,x=1);
+example(101);
+```
+
+Laziness
+--------
+
+Consider:
+
+```{r}
+
+nope <- function(x){
+    TRUE
+}
+
+nope(print("Hello Everyone"));
+
+```
+
+This _does not_ print "Hello Everyone" because the body of the
+function doesn't "use" `x` and thus the expression
+
+```{r}
+ope <- function(x){
+    x
+}
+ope(print("Hi"));
+```
+
+Will print `x`.
+
+Intermission
+============
+
+Our heads are probably filled to bursting at this point. But what
+we've done here has just been a more elaborate version of the
+exercise we went through with bash. In Bash scripting we have a set
+of relatively disjoint "environments": the filesystem, aliases, and
+environment variables. It isn't simplifying things too much to say
+that in Bash this is all you've got by way of environments.
+
+In R (so far) we've just seen one _kind_ of environment: one which
+just maps names to values of any kind. Regular values and functions
+share this environment.
+
+The primary difference has, so far, been that function calls create
+their own environments, and nested function definitions introduce
+relatively complicated variable lookup rules.
+
+Unless you get into so-called functional programming you might get
+by quite a while without having to think about these things in
+detail but unfortunately, in R, because of the Tidyverse, we need to
+develop a relatively good level of confidence with variable lookup
+rules because the Tidyverse breaks the rules pretty liberally.
+
+Tidbits
+=======
+
+Before we jump back into the crazy stuff, a few tidbits. 
+
+```
+?<function-name>
+```
+
+Will load the help for any built in function or any library function
+which has been properly documented.
+
+```
+apropos("search-term")
+```
+
+returns functions related to the search term. Sort of
+useful. Probably better to use Duck Duck Go.
+
+Newlines can be placed after a binary operator without changing the
+meaning of the phrase.
+
+```{r}
+10 +
+    11 ## ok
+
+10
++ 11 ## wrongish - 10, then 11
+```
+
+    Parentheses also work. You can also put newlines after commas in an argument list.
+
+Nonstandard Evaluation
+======================
+
+This is it!
+
+Let's prime our brains with a bit more mundane everyday R.
+
+```{r}
+
+library(tidyverse);
+dataframe <- read_csv("source_data/character-data.csv") %>% distinct();
+head(dataframe);
+
+```
+
+A dataframe is a really useful abstraction. It is a "data structure"
+which gives a row by column view of a data set. Each column is given
+a name. Data frames are the basis of most sorts of data analysis you
+might do in R.
+
+The "tidyverse" comes with a library "dplyr" which lets us quickly
+operate on data frames.
+
+eg:
+
+```{r}
+
+dataframe %>% group_by(property_name) %>% tally() %>% arrange(desc(n))
+
+group_by(dataframe, property_name)
+
+```
+
+A pretty common step in pre-processing data is to regularize and
+simplify character data. We can do this by removing spaces and
+non-alphanumeric characters and shifting everything to lowercase.
+
+eg:
+
+```{r}
+
+library(stringr);
+
+normalize_strings <- function(s){
+    str_replace_all(str_to_lower(s), "[^a-z]+", "_");
+}
+
+tidied <- dataframe %>%
+    mutate(property_name=normalize_strings(property_name),
+           universe=normalize_strings(universe),
+           character=normalize_strings(character),
+           value=normalize_strings(value)) %>% distinct();
+
+```
+
+Question: Above, inside the argument list for "mutate", we mention
+`property_name`? The code runs, and apparently _in that context_ it
+refers to the `property_name` column of the data frame. But _how_
+can we integrate that with our evaluation model?
+
+Currently, our model tells us that R sees the name and then looks in
+successively nested lexical environments until it sees one where the
+variable is bound. But there is no environment in our "stack" of
+environments where `property_name` is bound. So what gives?
+
+What gives is non-standard evaluation.
+
+substitute
+----------
+
+Consider the function:
+
+```{r}
+ex <- function(x){
+    substitute(x);
+}
+ex(v1+v2)
+```
+
+Recall that R is lazy about evaluating its arguments. `substitute`
+is a function which returns its arguments _without evaluating
+them_. Now we have something which we may call an "expression."
+
+This might be a little surprising of a thing to have, but if we
+think about what a programming language is its no surprise such a
+thing exists. R is just handing us the object it uses to evaluate
+code.
+
+Given an expression we can _evaluate it ourselves_ with `eval`.
+
+```{r}
+eval(ex(v1+v2),list(v1=c(1,2,3), v2=c(4,5,6)));
+```
+
+Now we can (almost) understand how `mutate` is doing its trick. It
+is capturing its arguments and substituting in its own evaluation
+context. Something like this:
+
+```{r}
+do_with_dataframe_columns <- function(df, expr){
+    eval(substitute(expr), df);
+}
+```
+
+With this function we may say:
+
+```{r}
+a_frame <- tibble(x=c(1,2,3), y=c(4,5,6));
+do_with_dataframe_columns(a_frame, x*y);
+```
+
+Of course, something more complicated must be going on with the
+tidyverse functions because the expressions we use there can access
+both column values and regular variable values from the environment
+where the expression was created.
+
+How does that work?
+
+A Stack of Environments
+-----------------------
+
+We can take inspiration from R itself for our solution. In fact,
+we're just going to rely on R's own strategy.
+
+Here we go:
+
+```{r}
+
+do_with_dataframe_columns2 <- function(df, expr){
+    e <- as.environment(df); ## Create an official environment object
+    parent.env(e) <- parent.frame(); ## set its parent to the environment where the function was called
+    eval(substitute(expr), e); ## Perform the evaluation.
+}
+
+z <- 100;
+
+do_with_dataframe_columns2(a_frame, z + x + y)
+
+```
+
+Problems w/ Tidyverse Evaluation
+================================
+
+Suppose you want to write a function which performs `group_by` and
+`tally` over a user-provided column.  Here is an attempt:
+
+```{r}
+group_and_tally <- function(df, column){
+    df %>% group_by(column) %>% tally();
+}
+group_and_tally(dataframe, property_name);
+```
+
+This gives us an error:
+
+```
++ + > Error: Must group by variables found in `.data`.
+* Column `column` is not found.
+Run `rlang::last_error()` to see where the error occurred.
+> 
+```
+
+Tons of problems here! 
+
+1. Because of the non-standard evaluation, we don't even true to
+   evaluate `property_name`. 
+2. Instead the evaluation strategy of the
+   tidyverse tries to evaluate `column` which we want to evaluate to
+   `property_name`. which hardly even makes sense.
+   
+We need some way to tell the tidyverse function that we want to use
+the _value_ of the argument passed in.
+
+```{r}
+group_and_tally <- function(df, column){
+    df %>% group_by({{ column }}) %>% tally();
+}
+group_and_tally(dataframe, property_name);
+```
+
+The construct `{{ }}` is called an "embrace." It is more a feature of
+the tidyverse than of R - the braces tell a tidyverse function that
+you want to refer to the name of the argument at the function
+call. How precisely `{{ }}` manages to work is out of the scope of
+this course but you can imagine: `group_by` captures the argument
+without evaluating it, inspects it to see that it is a `{{ }}`
+expression and then further pokes around in the current and parent
+environment to figure out what the enclosed symbol means.
+
+The Top Level Environment, Libraries and Packages
+=================================================
+
+In a latter portion of the course we will talk about how to write our
+own R libraries. But now that we have a relatively good understanding
+of environments and how variables are looked up we can understand how
+libraries work.
+
+When we say something like 
+
+```{r}
+library(readr)
+```
+
+We are telling R to insert the `readr` package (which you can think of
+as a kind of environment) onto the stack of environments in which R
+looks up top level bindings. Thus, all the exported variables in the
+package become visible.
+
+What happens if two packages expose the same variable? R will warn you
+that one has shadowed the other.
+
+Note that you can always access any variable from an installed package
+with a namespace qualifier like this:
+
+```{r}
+readr::read_csv
+```
+
+Indeed, when writing R packages, such explicit references are
+preferred.
+
+Conclusions
+===========
+
+The important thing to appreciate in this chapter is that because of 
+
+1. The lazy nature of R's evaluation of function arguments,
+2. The ability of function bodies to capture the expression passed in
+   rather than the value they represent
+3. The support in R for evaluating expressions in user-crafted
+   environments
+   
+it is possible that what looks like normal R code might do something
+surprising or cause surprising issues. 
+
+In some languages such features might be a mere curiousity but in R
+there is a widely used library set called the "tidyverse" which makes
+extensive use of these non-standard evaluation strategies. In our next
+lecture we will begin to discuss these libraries. 
+
+In general we will not pause to dwell on the non-standard semantics of
+expressions in the tidyverse unless they are of special interest, but
+its worthwhile that we appreciate that black magic is going on.
+
+

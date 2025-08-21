@@ -5,6 +5,9 @@ I've had a lot of time to think about this question since starting this job.
 I used to joke that a data scientist is just a statistician without 
 reason or accountability, but I have a more serious answer now.
 
+:student-select::What is a data scientist; ../students.json::
+
+
 Computers
 ---------
 
