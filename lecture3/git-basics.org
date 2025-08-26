@@ -1,0 +1,608 @@
+* What is Git
+Git is a "revision control system." The motivation for such systems is
+that it is very difficult for a group of people to work on a software
+project /at the same time/. The original version control systems aimed
+to solve this problem with centralized repositories.
+
+Users would have copies of the repository (which contains the
+authoritative source code for the project) and a suite of tools which
+constitute the version control system would make sure that changes
+that were submitted back to the official version of the code were
+correct.
+
+These systems also had the benefit of keeping a history of the
+project.
+
+* Enter Git
+
+Linux is a Unix-like operating system which is now probably the most
+common OS in the world in terms of computer clock cycles. Although
+Linux was created by Linus Torvalds, its development is a truly global
+collaborative effort.
+
+#+CAPTION: Linus Torvals, famous Jerk.
+[[./torvalds.jpg]]
+
+Up until ~2005 Linux was developed with BitKeeper, a proprietary
+system. Some kernel developers had done a little reverse engineering
+of that system and BitKeeper withdrew its free license so, over the
+course of several months Torvalds developed git for the purpose of
+managing distributed development of Linux.
+
+To this day, it is still the Linux developers who use git at the
+highest level and there is much to be admired about their workflow if
+not their culture.
+
+* What is Git, though?
+
+Git is a tool which allows to keep a history of your software project
+as a series of "checkpoints." It also allows you or another party or
+parties to maintain other /versions/ of the software project, in which
+case git provides extensive utilities to merge or otherwise combine or
+modify multiple different "branches" or "forks" of the software.
+
+* Github?
+
+/Github/ is a website which allows you to /host/ git repositories. In
+a very real sense /git/ and /github/ are two entirely distinct
+entities. One can easily spend their whole life using git productively
+in every way it is intended to be used /without ever using github./
+
+That said, github provides a set of other services (on top of free
+non-commercial hosting) that make it an attractive place to back up
+and work with your git repositories. We will be using it in this
+course.
+
+
+* Git User Stories
+
+(NB - a user story is a description of the sorts of things you might
+do with git).
+
+** Recovering Lost Work
+
+A pothole bounces your laptop out of the window of a bus whereupon it
+is run over by a cement truck.
+
+When you get your new laptop you say:
+
+#+begin_src bash
+
+git clone git@github.com:Vincent-Toups/datasci611.git
+
+#+end_src
+
+And you get your code back at the last commit. Because you are
+diligent and careful, you commit often and have only lost a day or so
+of work.
+
+** Coordinating with Other Developers
+
+You have a data science project on github which analyzes time series
+data. An interested researcher in France forks your repository and
+notices an improvement can be made to your data cleaning
+pipeline. They make a pull request on github. 
+
+You can see exactly what lines of code they change. Some of the
+changes are good but one line is problematic. You accept only the
+efficacious changes.
+
+** Understanding the Past
+
+After working on your project for several months you run a piece of
+code that used to work but which you haven't fiddled with in
+awhile. It breaks.
+
+You write a small script to test for the error and git finds the exact
+commit (change) that broke the code. Your commit log tells you why you
+did it and makes it easy to resolve the problem.
+
+* The Awful Truth
+
+Unfortunately, git is very much a tool which rewards the user only
+when they use it at a very high level. That is why we'll have another
+chapter on high level git usage. But for now we will satisfy ourselves
+with just using git as basic level.
+
+* Why use git at the command line?
+
+I'll be emphasizing using git from the command line. Why? Because in
+order to really get the benefits of the system we need to understand
+it at a deep level. Using the shell api directly is the best way to do
+that.
+
+* How use git at the command line?
+
+On Linuxy systems and on a Mac you should be able to use your package
+manager to install git directly.
+
+Predictably, Windows is the real hassle here. On Windows you can
+install [[https://gitforwindows.org/][Git For Windows]], [[https://desktop.github.com/][Github Desktop]], [[https://docs.microsoft.com/en-us/windows/wsl/tutorials/wsl-git][or use git on WSL]]. Git is one
+of the few tools we'll primarily be using _outside_ of our Docker
+environments, so you should choose one of these and make sure you know
+how to get a `git bash` going.
+
+* Git Basics
+
+We create a git repository by going _into_ the folder where we want
+the repository to be and saying `git init`.
+
+#+begin_src sh :results code :exports both 
+  cd /tmp/
+  rm -rf example
+  mkdir example
+  cd example
+  git init --initial-branch main
+#+end_src
+
+#+RESULTS:
+#+begin_src sh
+Initialized empty Git repository in /tmp/example/.git/
+#+end_src
+
+Note that all a git repository is is a directory which has a ~.git~
+subdirectory. Of course that ~.git~ subdirectory is managed by ~git~
+and needs to be specific in its format 
+
+Now we can enter the command which we will probably type most often in
+our git lives:
+
+#+begin_src sh :results code :exports both :dir /tmp/example
+git status
+#+end_src
+
+#+RESULTS:
+#+begin_src sh
+On branch main
+
+No commits yet
+
+nothing to commit (create/copy files and use "git add" to track)
+#+end_src
+
+* A historical note
+
+In older projects you might notice that the most important branch is
+often called "master." Given the history of western civilization and
+the ongoing impact of historical slavery in people's lives, the
+tendency has gradually shifted to using "main" as the most important
+branch.
+
+But this also serves as a good seque into the following useful
+comment: there is nothing special about the main branch - "main" is
+just a name which we apply to a branch to communicate the fact that it
+is an important branch. But from git's point of view, there isn't
+anything magical about it. A git repository can have many branches
+named whatever we'd like. It can, in fact, have multiple branches
+totally unrelated to one another, with no history in common.
+
+As we will learn when we discuss git concepts later, a branch is just
+a name pointing to a commit and a little bit of logic which tells that
+pointer to move forward when new commits are added to the branch.
+
+The ~git status~ invocation we performed above tells us about the
+current status of the repository we are in. ~git~ commands work
+anywhere beneath the directory 
+
+* What is Version Control (Baby Version)
+
+We've seen how to run git but what does it do?
+
+Simple version: git maintains a history of your codebase as a chain of
+"commits."
+
+Let's see what that looks like:
+
+#+begin_src sh :results code :exports both :dir /tmp/example
+cat <<EOF > README.md
+Example
+=======
+
+This is an example readme at the first commit.
+
+EOF
+
+git status
+#+end_src
+
+#+RESULTS:
+#+begin_src sh
+On branch main
+
+No commits yet
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	README.md
+
+nothing added to commit but untracked files present (use "git add" to track)
+#+end_src
+
+(Note - this business with EOF (stands for "End of File") is called a
+"here doc" because its a document right here. This is just a "stupid
+shell trick" to create a file in a shell script.
+
+Now we will make our first commit.
+
+#+begin_src sh :results code :exports both :dir /tmp/example
+  git add README.md # tell git we want README.md to be in the upcomming commit.
+  git config --global user.email "toups@email.unc.edu"
+  git config --global user.name "Vincent Toups"
+  # we only have to do the above once.
+  git commit -m "Initial commit."
+#+end_src
+
+#+RESULTS:
+#+begin_src sh
+[main (root-commit) ab48777] Initial commit.
+ 1 file changed, 5 insertions(+)
+ create mode 100644 README.md
+#+end_src
+
+And the status:
+
+#+begin_src sh :results code :exports both :dir /tmp/example
+git status
+#+end_src
+
+#+RESULTS:
+#+begin_src sh
+On branch main
+nothing to commit, working tree clean
+#+end_src
+
+And now we can ask git to tell us the history of the project so far:
+
+#+begin_src sh :results code :exports both :dir /tmp/example
+git log 
+#+end_src
+
+#+RESULTS:
+#+begin_src sh
+commit 3b04865fb07730643d9358b465713ef50e5177ba
+Author: Vincent Toups <toups@email.unc.edu>
+Date:   Mon Aug 30 11:34:03 2021 -0400
+
+    Initial commit.
+#+end_src
+
+* Additional Commits
+
+At its most basic level we use git by rinsing and repeating the above
+process.
+
+#+begin_src sh :results code :exports both :dir /tmp/example
+cat <<EOF > hello.R
+print("Hello World.");
+EOF
+git add hello.R
+git commit -m "Initial R source file."
+#+end_src
+
+#+RESULTS:
+#+begin_src sh
+[main 32dd9c2] Initial R source file.
+ 1 file changed, 1 insertion(+)
+ create mode 100644 hello.R
+#+end_src
+
+Note that a commit consists of ONLY those changes we tell git to add
+to it with `git add`. If you have used subversion (unlikely since this
+class is mostly youngsters) this is not how things work. Git doesn't
+"track" files. It just records changes which you tell it to record.
+
+Let's modify our README to see what a change to a file that is already
+in the repository history looks like.
+
+#+begin_src sh :results code :exports both :dir /tmp/example
+cat <<EOF > README.md
+Example
+=======
+
+This is an example readme.
+
+In addition to editing the line above we've added
+some lines for didactic purposes.
+
+EOF
+
+git status
+#+end_src
+
+#+RESULTS:
+#+begin_src sh
+On branch main
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   README.md
+
+no changes added to commit (use "git add" and/or "git commit -a")
+#+end_src
+
+Note that git is telling us that a file is modified but that no
+changes are staged for commit.
+
+If we want more details we can ask:
+
+#+begin_src sh :results code :exports both :dir /tmp/example
+git diff # read as "git difference"
+#+end_src
+
+#+RESULTS:
+#+begin_src sh
+diff --git a/README.md b/README.md
+index 818a9f8..3dbf654 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,8 @@
+ Example
+ =======
+ 
+-This is an example readme at the first commit.
++This is an example readme.
++
++In addition to editing the line above we've added
++some lines for didactic purposes.
+ 
+#+end_src
+
+The above is a patch. It describes how we need to change the previous
+state of the repository to make it match what we have now. Just squint
+at it for now, we'll learn to read patches in detail later.
+
+Let's create a new file so we can see hwo things work when there are
+multiple changes.
+
+#+begin_src sh :results code :exports both :dir /tmp/example
+cat <<EOF > hello.py
+print("Hello World.");
+EOF
+git status
+#+end_src
+
+#+RESULTS:
+#+begin_src sh
+On branch main
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   README.md
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	hello.py
+
+no changes added to commit (use "git add" and/or "git commit -a")
+#+end_src
+
+Now one really nice thing about git is that it really does tell you
+how to use it if you just read the output of git status. Let's stage
+just the new file:
+
+#+begin_src sh :results code :exports both :dir /tmp/example
+  git add hello.py
+  git status
+#+end_src
+
+#+RESULTS:
+#+begin_src sh
+On branch main
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	new file:   hello.py
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   README.md
+
+#+end_src
+
+Now we can see that if we ~commit~ the commit will only contain
+~hello.py~.
+
+#+begin_src sh :results code :exports both :dir /tmp/example
+  git commit -m "Added hello.py"
+  git status
+#+end_src
+
+#+RESULTS:
+#+begin_src sh
+[main 561ace2] Added hello.py
+ 1 file changed, 1 insertion(+)
+ create mode 100644 hello.py
+On branch main
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   README.md
+
+no changes added to commit (use "git add" and/or "git commit -a")
+#+end_src
+
+Sure enough - we no longer see any information about ~hello.py~ but
+our other changes are still there.
+
+* The Git Trinity
+
+A bit like when we learned Bash you need to start to build a mental
+model of git in your brain. And the three most important parts of that
+mental model are:
+
+1. the branch (and its HEAD) - the current state of the repository at
+   the HEAD of the last branch.
+2. the staging area - the changes that will become the /next/ commit.
+3. the working copy - what is in the directory where you are working.
+
+The thing to burn into your brain is "I fill the staging area with git
+add and then add those changes to the branch with git commit."
+
+* Using Github
+
+Github is a hosting service for git repositories plus a constellation
+of other utilities. 
+
+It is entirely separate from git and, in a sense, is parasitic on
+it. This is typical of [[https://en.wikipedia.org/wiki/Platform_economy#Assessment][Platform Economics]] and we should all be a
+little suspicious of it. But like the jaws of history, we are all in
+the jaws of network effects and consequently we have to accomodate
+github.
+
+I will only say that there are [[https://itsfoss.com/github-alternatives/][alternatives]].
+
+** Step 1
+
+The first step is to create a git repository locally. We know how to
+do that already. When you are ready to push to github, you create a
+repository there like this:
+
+#+CAPTION: Creating a new repository.
+[[./new_repository.png]]
+
+This will give you some instructions like this:
+
+#+CAPTION: Filling in the form
+[[./new_form.png]]
+
+I'm sure there are situations where you might want to create a
+repository _first_ on github and then clone it, but it seems silly to
+me. We have at least that much dignity.
+
+We want the second set of instructions from this:
+
+#+begin_src 
+…or create a new repository on the command line
+
+echo "# 611-example" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin git@github.com:Vincent-Toups/611-example.git
+git push -u origin main
+
+…or push an existing repository from the command line
+
+git remote add origin git@github.com:Vincent-Toups/611-example.git
+git branch -M main
+git push -u origin main
+
+#+end_src
+
+Indeed, these instructions sort of assume we're real git newbies,
+which we are not. We are already on the branch ~main~ so we just need
+to say 
+
+#+begin_src sh :results code :exports both :dir /tmp/example
+  git remote add origin git@github.com:Vincent-Toups/611-example.git
+  git push -u origin main
+#+end_src
+
+But wait!
+
+Before we do that we need to think about /authentication/.
+
+If you are using Windows git probably installed a credential
+manager. But I'm going to show you how to set up an SSH key so you
+don't have to keep typing in your git password over and over and so
+you'll know how to use ssh keys later for other reasons.
+
+* What is an SSH Key Pair?
+
+SSH Keys are handy little blobs of data. You have a public key, which
+you can freely distribute to anyone for any reason, pretty much. And
+you have a private key. Using your private key you can generate a
+message which someone can use your public key to verify comes from
+you. You don't need to share your private key to authenticate
+yourself.
+
+On a unix-like shell (git bash also works) you generate an ssh key pair
+like this:
+
+(PS - DON'T do this in your git repository! Keep your ssh key private!)
+
+#+begin_src sh 
+$ cd /tmp/
+$ mkdir ssh-keys
+$ cd ssh-keys/
+$ ssh-keygen
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/toups/.ssh/id_rsa): github_rsa_key
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in github_rsa_key
+Your public key has been saved in github_rsa_key.pub
+The key fingerprint is:
+SHA256:OrCwHThgGEzWpSHmyqt4jdIOca31GZ51Q1n6bcFJW2c toups@7cdbeba530bb
+The key's randomart image is:
++---[RSA 3072]----+
+|+=....      . . E|
+|=o..o      + o =.|
+|oo .      +   =  |
+|+. o     . . . . |
+|o.= = . S o . o  |
+| o.B * * . . .   |
+|.oooo B          |
+|+.+ .  .         |
+|o+.              |
++----[SHA256]-----+
+$  
+#+end_src
+
+This will generate two files. It is very important to understand that
+the ~.pub~ file is the PUBLIC key. This is the key you can upload to
+github. Never let anyone have a copy of your private key. Indeed, be
+careful to avoid distributing it accidentally!
+
+Now we can upload our key to github. First select "Settings":
+
+
+#+CAPTION: select settings
+[[./settings.png]]
+
+Then "SSH and GPG Keys"
+
+#+CAPTION: keys
+[[./ssh-keys-menu.png]]
+
+Then "New SSH Key"
+
+#+CAPTION: new ssh key
+[[./new-ssh-key.png]]
+
+You can put anything you want for the title, but its useful to put
+something like "work laptop" that identifies where the associated
+private key is stored. Then you will need to open the public key file
+(in notepad, for instance) and copy it carefully into the text box.
+
+Once you've completed this process you can finally go back to your
+console.
+
+#+begin_src sh :results code :exports both :dir /tmp/example
+  ssh-add /tmp/ssh-keys/github_rsa_key
+  git remote add origin git@github.com:Vincent-Toups/611-example.git
+  git push -u origin main  
+#+end_src
+
+#+RESULTS:
+#+begin_src sh
+Branch 'main' set up to track remote branch 'main' from 'origin'.
+#+end_src
+
+Here we've informed our ssh-agent that we want to use the specified
+private key and then we simply push. If we refresh our repo page we
+should see our files and our README.
+
+#+CAPTION: Tada
+[[./repo.png]]
+
+* Conclusions
+
+So we have a basic understanding of git. There is a lot more to learn
+and we shall. But now you should be able to create a repository, add
+stuff to commits, associate it with a repository hosted by github,
+push, etc.
+
+Eventually we will need to learn all the powers of git. But in the
+meantime this will let us get started with some data science!
