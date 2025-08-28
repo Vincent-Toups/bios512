@@ -1,0 +1,7 @@
+- ::01_introductory_notes:Introductory Notes::
+- ::02_common_problems_with_data_sets:Common Problems With Data Sets::
+- ::03_how_to_defend_yourself:How to Defend Yourself::
+- ::04_using_dplyr_and_readr:Using Dplyr and Readr::
+- ::05_review_of_dplyr_tidyr:Review of Dplyr & TidyR::
+- ::06_ggplot:ggplot::
+- ::07_what_makes_a_visualization_good:What Makes A Visualization Good?::
