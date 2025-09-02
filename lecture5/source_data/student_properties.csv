@@ -1,0 +1,63 @@
+id,student_id,property,value
+1,1,hometown,Wilmington NC
+2,1,hs_gpa,3.3
+3,1,intended_minor,Linguistics
+4,2,hometown,Savannah GA
+5,2,sat_math,690
+6,2,intended_minor,Statistics
+7,3,hometown,Madison WI
+8,3,hs_gpa,3.1
+9,3,club_interest,storm_chasing
+10,4,hometown,Boulder CO
+11,4,hs_gpa,3.5
+12,4,intended_minor,Folklore
+13,5,hometown,Portland OR
+14,5,hs_gpa,3.6
+15,5,intended_minor,Urban Planning
+16,6,hometown,Austin TX
+17,6,act_composite,27
+18,6,intended_minor,Public History
+19,7,hometown,Raleigh NC
+20,7,hs_gpa,3.2
+21,7,languages,English,Spanish
+22,8,hometown,Milwaukee WI
+23,8,hs_gpa,3.4
+24,8,club_interest,map_society
+25,9,hometown,Asheville NC
+26,9,hs_gpa,3.0
+27,9,dietary_preference,vegetarian
+28,10,hometown,Durham NC
+29,10,sat_math,710
+30,10,intended_minor,Physics
+31,11,hometown,Greensboro NC
+32,11,hs_gpa,3.3
+33,11,intended_minor,Digital Humanities
+34,12,hometown,Richmond VA
+35,12,hs_gpa,3.1
+36,12,languages,English,French
+37,13,hometown,Cary NC
+38,13,act_composite,30
+39,13,club_interest,robotics
+40,14,hometown,Winston-Salem NC
+41,14,hs_gpa,3.2
+42,14,intended_minor,Economics
+43,15,hometown,Charlotte NC
+44,15,hs_gpa,3.0
+45,15,club_interest,baking_club
+46,16,hometown,Norfolk VA
+47,16,sat_math,650
+48,16,intended_minor,Acoustics
+49,17,hometown,Athens GA
+50,17,hs_gpa,2.9
+51,17,intended_minor,Creative Writing
+52,18,hometown,Roanoke VA
+53,18,hs_gpa,3.5
+54,18,club_interest,aerial_arts
+55,19,hometown,Chapel Hill NC
+56,19,hs_gpa,3.3
+57,19,languages,English,Italian
+58,20,hometown,Greenville NC
+59,20,act_composite,29
+60,20,intended_minor,Mathematics
+61,99,hometown,Nowhereville ZZ
+62,99,hs_gpa,3.9

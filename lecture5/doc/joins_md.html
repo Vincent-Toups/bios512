@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta charset="UTF-8">
+
+<title>joins - RDoc Documentation</title>
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "./";
+  var index_rel_prefix = "./";
+</script>
+
+<script src="./js/navigation.js" defer></script>
+<script src="./js/search.js" defer></script>
+<script src="./js/search_index.js" defer></script>
+<script src="./js/searcher.js" defer></script>
+<script src="./js/darkfish.js" defer></script>
+
+<link href="./css/fonts.css" rel="stylesheet">
+<link href="./css/rdoc.css" rel="stylesheet">
+
+
+<body id="top" role="document" class="file">
+<nav role="navigation">
+  <div id="project-navigation">
+    <div id="home-section" role="region" title="Quick navigation" class="nav-section">
+  <h2>
+    <a href="./index.html" rel="home">Home</a>
+  </h2>
+
+  <div id="table-of-contents-navigation">
+    <a href="./table_of_contents.html#pages">Pages</a>
+    <a href="./table_of_contents.html#classes">Classes</a>
+    <a href="./table_of_contents.html#methods">Methods</a>
+  </div>
+</div>
+
+    <div id="search-section" role="search" class="project-section initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <div id="search-field-wrapper">
+      <input id="search-field" role="combobox" aria-label="Search"
+             aria-autocomplete="list" aria-controls="search-results"
+             type="text" name="search" placeholder="Search" spellcheck="false"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </div>
+
+    <ul id="search-results" aria-label="Search Results"
+        aria-busy="false" aria-expanded="false"
+        aria-atomic="false" class="initially-hidden"></ul>
+  </form>
+</div>
+
+  </div>
+
+  
+<div class="nav-section">
+  <h3>Table of Contents</h3>
+
+  <ul class="link-list" role="directory">
+    <li><a href="#label-Joins">Joins</a>
+    <li><a href="#label-Definitions-3A">Definitions:</a>
+    <li><a href="#label-Pivots">Pivots</a>
+  </ul>
+</div>
+
+
+  <div id="project-metadata">
+    
+<div id="fileindex-section" class="nav-section">
+  <h3>Pages</h3>
+
+  <ul class="link-list">
+    <li><a href="./derived_data/student_long_csv.html">student_long.csv</a>
+    <li><a href="./joins_md.html">joins</a>
+    <li><a href="./source_data/address_csv.html">address.csv</a>
+    <li><a href="./source_data/frat_boys_basic_csv.html">frat_boys_basic.csv</a>
+    <li><a href="./source_data/fraternity_csv.html">fraternity.csv</a>
+    <li><a href="./source_data/major_csv.html">major.csv</a>
+    <li><a href="./source_data/student_csv.html">student.csv</a>
+    <li><a href="./source_data/student_properties_csv.html">student_properties.csv</a>
+    <li><a href="./tabular_data_ipynb.html">tabular_data.ipynb</a>
+    <li><a href="./tabular_data_md.html">tabular_data</a>
+  </ul>
+</div>
+
+  </div>
+</nav>
+
+<main role="main" aria-label="Page joins.md">
+
+<h1 id="label-Joins">Joins<span><a href="#label-Joins">&para;</a> <a href="#top">&uarr;</a></span></h1>
+
+<p>They are called joins because they join data from multiple tables.</p>
+
+<h2 id="label-Definitions-3A">Definitions:<span><a href="#label-Definitions-3A">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<ol><li>
+<p>table: a data structure wit some columns (usually named) and a some rows.</p>
+</li><li>
+<p>observation: one item of interest (often one row, but not always)</p>
+</li><li>
+<p>key: a column or columns (almost always unique) which identifies an observation</p>
+</li><li>
+<p>join: the process of combining tables (almost always using keys)</p>
+</li><li>
+<p>query: a program which uses some tables, joins, filters, subsets columns,  create new columns and returns a new table</p>
+</li><li>
+<p>relational data(base): a collection of tables organized along the above lines</p>
+</li><li>
+<p>pivot: when we change our notion of observation we “pivot” our data so that  we have one row per observation.</p>
+</li></ol>
+
+<p>All we have to do to understand joins is just think carefully about all the ways we might want to put data together.</p>
+
+<p>Logically, I want to talk about pivots first, though.</p>
+
+<h2 id="label-Pivots">Pivots<span><a href="#label-Pivots">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>Again, if we first understand that we want <em>one observation per row</em> then pivots make sense.</p>
+
+<p>Consider our original table:</p>
+
+<p>:table:source_data/frat_boys_basic.csv::</p>
+
+<p>The observation here is one person per row. But what if someone approached you and asked “How much information do we have about each student in this data set?”</p>
+
+<p>In that case a single observation is “a student and a recording of some data.”</p>
+
+<p>From that point of view, multiple observations occur on each row of our basic data set and we want to <em>pivot</em> to a different conception of an observation.</p>
+
+<pre>Nota bene: You often see people name variables `df` or `data.` Even I do it. This
+is ok for quick demonstrations but there is something to consider - short
+variable names don&#39;t convey much information and they sometimes overlap with 
+functions defined in the global scope (both df and data have this issue) which can
+cause confusing errors. It is usually good to give concise but informative names.</pre>
+
+<pre class="ruby"><span class="ruby-identifier">library</span>(<span class="ruby-identifier">tidyverse</span>)
+
+<span class="ruby-identifier">students</span> <span class="ruby-operator">&lt;</span><span class="ruby-operator">-</span> <span class="ruby-identifier">read_csv</span>(<span class="ruby-string">&quot;source_data/frat_boys_basic.csv&quot;</span>)
+
+<span class="ruby-comment"># note we pivot _longer_ because we need more rows for our observations</span>
+<span class="ruby-identifier">student_data</span> <span class="ruby-operator">&lt;</span><span class="ruby-operator">-</span> <span class="ruby-identifier">pivot_longer</span>(<span class="ruby-identifier">students</span>, <span class="ruby-value">fraternity:</span><span class="ruby-identifier">dietary_preference</span>)
+
+<span class="ruby-identifier">mddf</span>(<span class="ruby-identifier">student_data</span>)
+</pre>
+
+<p>We got an error - this is an example of a type failure. To understand this we need to consider the following things:</p>
+<ol><li>
+<p>tibbles/data frames are lists of columns which are R vectors</p>
+</li><li>
+<p>r vectors are homogeneous in type</p>
+</li><li>
+<p>When we pivot longer we are trying to put all the different values in  different columns into a single column (thus requring more rows)</p>
+</li><li>
+<p>but our original columns have different types.</p>
+</li></ol>
+
+<p>There are ways to deal with this. One is to pivot multiple times based on the types of columns we have and then join the data back together, resulting in a frame where each row is a value observation but with multiple columns, one per type.</p>
+
+<p>We could also use a list column and wrap our elements so we can have a heterogenous column.</p>
+
+<p>The easiest thing is to just convert everything to characters and reconvert later - a perilous thing to do but ok for now.</p>
+
+<pre>library(tidyverse)
+
+students &lt;- read_csv(&quot;source_data/frat_boys_basic.csv&quot;)
+
+
+# note we pivot _longer_ because we need more rows for our observations
+student_data &lt;- pivot_longer(students, fraternity:dietary_preference,
+  names_to = &quot;property&quot;,
+  values_to = &quot;observation&quot;,
+  values_transform = function(x) ifelse(is.na(x), NA, as.character(x)))
+
+mddf(student_data)</pre>
+
+<p>Ok, so now we can answer the given question: how much data do we have on each student?</p>
+
+<pre>
+library(tidyverse)
+
+students &lt;- read_csv(&quot;source_data/frat_boys_basic.csv&quot;)
+
+mdpre(problems(students))
+
+
+# note we pivot _longer_ because we need more rows for our observations
+student_data &lt;- pivot_longer(students, fraternity:dietary_preference,
+  names_to = &quot;property&quot;,
+  values_to = &quot;observation&quot;,
+  values_transform = function(x) ifelse(is.na(x), NA, as.character(x))) %&gt;%
+  filter(complete.cases(.)) 
+
+ensure_directory(&quot;derived_data&quot;)
+write_csv(student_data, &quot;derived_data/student_long.csv&quot;);
+
+mddf(student_data %&gt;% 
+                 group_by(name) %&gt;%  
+                 tally() %&gt;% 
+                 arrange(desc(n)))</pre>
+
+<p>New plain text</p>
+
+</main>
+
+
+
+<footer id="validator-badges" role="contentinfo">
+  <p><a href="https://validator.w3.org/check/referer">Validate</a>
+  <p>Generated by <a href="https://ruby.github.io/rdoc/">RDoc</a> 6.3.1.
+  <p>Based on <a href="http://deveiate.org/projects/Darkfish-RDoc/">Darkfish</a> by <a href="http://deveiate.org">Michael Granger</a>.
+</footer>
+
