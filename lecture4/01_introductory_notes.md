@@ -8,7 +8,7 @@ editor_options:
 
 FINALLY we are ready to do some data-science material.
 
-The fact is, its a very rare situation indeed that you will receive a
+The fact is, it's a very rare situation indeed that you will receive a
 "clean" dataset. This might seem like a surprise to you if you are, for
 instance, a scientist working in a laboratory setting on small data
 sets. In those situations, data collection is quite controlled and while
@@ -41,4 +41,4 @@ problems](https://www.popularmechanics.com/science/a22577/genetics-papers-excel-
 ![](./excel_errors.png)
 
 
-::02_common_problems_with_data_sets:Next： Common Problems With Data Sets::
+::02_common_problems:Next∶ Common Problems With Data Sets::

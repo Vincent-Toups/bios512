@@ -1,0 +1,13 @@
+- ::01_introductory_notes:Introductory Notes::
+- ::02_common_problems:Common Problems With Data Sets::
+- ::03_how_to_defend:How to Defend Yourself::
+- ::04_using_dplyr_and_readr:Using Dplyr and Readr + Magrittr::
+- ::05_back_to_business:Back to Business::
+- ::06_joins:Joins::
+- ::07_summaries_tidy_pivots:Summaries + Tidy vs Non-Tidy + Pivots::
+- ::08_review:Review of Dplyr & TidyR::
+- ::09_ggplot:ggplot::
+- ::10_ggplot_concepts:ggplot concepts::
+- ::11_geometries:GGPlot Geometries::
+- ::12_non_trivial_example:Non-trivial Example::
+- ::13_good_viz:What Makes A Visualization Good?::
